@@ -1,0 +1,90 @@
+#root {
+  position: relative;
+  height: 100%;
+}
+
+.app {
+  width: 80%;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.linkButton__button {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
+.linkButton__button:hover {
+  text-decoration: underline;
+  color: blue;
+}
+
+.formButton__button {
+  padding: 3px;
+  border-radius: 3px;
+  border: 1px solid #6cf;
+  background-color: white;
+  color: #6cf;
+  cursor: pointer;
+}
+
+.formButton__button:hover {
+  border-color: blue;
+  color: blue;
+}
+
+.allPostsHeader {
+  position: relative;
+  height: 50px;
+  margin-top: 30px;
+}
+
+.allPostsHeader__title {
+  display: inline-block;
+}
+
+.allPostsHeader__link {
+  position: absolute;
+  top: 14px;
+  right: 100px;
+}
+
+.allPostsHeader__button {
+  position: absolute;
+  top: 11px;
+  right: 10px;
+}
+
+.postItem {
+  position: relative;
+  height: 30px;
+}
+
+.postItem__title {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.postItem__title:hover {
+  text-decoration: underline;
+  color: blue;
+}
+
+.postItem__author {
+  position: absolute;
+  right: 0;
+  display: inline-block;
+  font-size: 12px;
+}
+
+.breadCrumb {
+  height: 30px;
+}
+
+.breadCrumb__chevron {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
