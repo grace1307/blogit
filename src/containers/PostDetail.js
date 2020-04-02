@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import constants from '../constants'
 import network from '../utils/network'
@@ -6,64 +6,56 @@ import network from '../utils/network'
 import Title from '../presentation/Title'
 import LinkButton from '../presentation/LinkButton'
 
-class PostDetail extends Component {
-  constructor() {
-    super()
+export default function PostDetail(props){
 
-    this.state = {
-      title: '',
-      body: ''
-    }
+  const { currPostId, onCurrPageChange } = props
 
-    this.handleBackButtonClicked = this.handleBackButtonClicked.bind(this)
-  }
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
 
-  componentDidMount() {
-    const { currPostId } = this.props
+  useEffect(() => {
+    let isCancelled = false
 
     network.sendGet(`${constants.endpoints.posts}/${currPostId}`, {}, post => {
       try {
         const postObject = JSON.parse(post)
 
-        this.setState({ title: postObject.title, body: postObject.body })
+        !isCancelled && setTitle(postObject.title)
+        !isCancelled && setBody(postObject.body) 
+        // extract string
       } catch (error) {
         console.error(error)
       }
     })
-  }
 
-  handleBackButtonClicked() {
-    const { onCurrPageChange } = this.props
+    return () => {
+      isCancelled = true
+    }
+  }, [currPostId])
 
+  const handleBackButtonClicked = () => {
     onCurrPageChange(constants.pageKey.allPosts)
   }
 
-  render() {
-    const { title, body } = this.state
-
-    return (
-      <div className='postDetail'>
-        <LinkButton
-          className='postDetail__linkButton'
-          onButtonClick={this.handleBackButtonClicked}
-          text='< Home'
-        />
-        <Title
-          className='postDetail__title'
-          content={title}
-        />
-        <div className='postDetail__body'>
-          {body}
-        </div>
+  return(
+    <div className='postDetail'>
+      <LinkButton
+        className='postDetail__linkButton'
+        onButtonClick={handleBackButtonClicked}
+        text='< Home'
+      />
+      <Title
+        className='postDetail__title'
+        content={title}
+      />
+      <div className='postDetail__body'>
+        {body}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 PostDetail.propTypes = {
   currPostId: PropTypes.number.isRequired,
   onCurrPageChange: PropTypes.func.isRequired,
 }
-
-export default PostDetail
-

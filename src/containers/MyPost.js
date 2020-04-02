@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import constants from '../constants'
 import network from '../utils/network'
@@ -6,94 +6,74 @@ import network from '../utils/network'
 import MyPostsHeader from '../presentation/MyPostsHeader'
 import PostItem from '../presentation/PostItem'
 
-class MyPost extends Component {
-  constructor() {
-    super()
+export default function MyPost(props){
 
-    this.state = {
-      posts: []
-    }
-    this.handleEditClicked = this.handleEditClicked.bind(this)
-    this.handleDeleteClick = this.handleDeleteClick.bind(this)
-    this.handleTitleClicked = this.handleTitleClicked.bind(this)
-  }
+  const { userId, onCurrPageChange, onCurrPostIdChange } = props
 
-  componentDidMount() {
-    const { userId } = this.props
+  const [posts, setPosts] = useState([])
 
+  useEffect(() => {
     network.sendGet(constants.endpoints.posts, { userId }, posts => {
       try {
-        this.setState({ posts: JSON.parse(posts) })
+        setPosts(JSON.parse(posts))
       } catch (error) {
         console.error(error)
       }
     })
-  }
+  }, [userId])
 
-  handleEditClicked(postId) {
-    const { onCurrPageChange, onCurrPostIdChange } = this.props
-
+  const handleEditClicked = postId => {
     onCurrPostIdChange(postId, () => {
-      onCurrPageChange(constants.pageKey.editPost)
+    onCurrPageChange(constants.pageKey.editPost)
     })
   }
 
-  handleTitleClicked(postId) {
-    const { onCurrPageChange, onCurrPostIdChange } = this.props
-
+  const handleTitleClicked = postId => {
     onCurrPostIdChange(postId, () => {
-      onCurrPageChange(constants.pageKey.postDetail)
+    onCurrPageChange(constants.pageKey.postDetail)
     })
   }
 
-  handleDeleteClick(postId) {
-    network.sendDelete(`${constants.endpoints.posts}/${postId}`, {}, () => {
-      const { posts } = this.state
-
-      this.setState({ posts: posts.filter(post => post.id !== postId) })
-    })
-  }
-
-  render() {
-    const { onCurrPageChange } = this.props
-    const { posts } = this.state
-    const items = posts.map(post => {
-      const { id, title } = post
-
-      return (
-        <PostItem
-          id={id}
-          title={title}
-          author='Me'
-          key={`post-id-${id}`}
-          className='myPosts__item'
-          isMutable
-          onEditClick={() => this.handleEditClicked(id)}
-          onDeleteClick={() => this.handleDeleteClick(id)}
-          onTitleClick={this.handleTitleClicked}
-        />
-      )
-    })
-
-    return (
-      <div className='myPosts'>
-        <MyPostsHeader
-          onCurrPageChange={onCurrPageChange}
-        />
-        <div className='myPosts__list'>
-          {items}
-        </div>
-      </div>
+  const handleDeleteClick = postId => {
+    network.sendDelete(
+      `${constants.endpoints.posts}/${postId}`,
+      {},
+      () => setPosts(posts.filter(post => post.id !== postId))
     )
   }
-}
 
+  const items = posts.map(post => {
+    const { id, title } = post
+
+    return (
+      <PostItem
+        id={id}
+        title={title}
+        author='Me'
+        key={`post-id-${id}`}
+        className='myPosts__item'
+        isMutable
+        onEditClick={() => handleEditClicked(id)}
+        onDeleteClick={() => handleDeleteClick(id)}
+        onTitleClick={handleTitleClicked}
+      />
+    )
+  })
+
+  return(
+    <div className='myPosts'>
+      <MyPostsHeader
+        onCurrPageChange={onCurrPageChange}
+      />
+      <div className='myPosts__list'>
+        {items}
+      </div>
+    </div>
+  )
+}
 
 MyPost.propTypes = {
   onCurrPageChange: PropTypes.func.isRequired,
   onCurrPostIdChange: PropTypes.func.isRequired,
   userId: PropTypes.number.isRequired,
 }
-
-export default MyPost
-
